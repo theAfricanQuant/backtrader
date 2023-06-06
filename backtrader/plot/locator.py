@@ -51,9 +51,7 @@ def _idx2dt(idx, dates, tz):
     idx = int(round(idx))
     if idx >= ldates:
         idx = ldates - 1
-    if idx < 0:
-        idx = 0
-
+    idx = max(idx, 0)
     return num2date(dates[idx], tz)
 
 
@@ -198,12 +196,7 @@ class AutoDateLocator(ADLocator):
             # We found what frequency to use
             break
         else:
-            if False:
-                raise ValueError(
-                    'No sensible date limit could be found in the '
-                    'AutoDateLocator.')
-            else:
-                usemicro = True
+            usemicro = True
 
         if not usemicro and use_rrule_locator[i]:
             _, bymonth, bymonthday, byhour, byminute, bysecond, _ = byranges
@@ -239,9 +232,7 @@ class AutoDateFormatter(ADFormatter):
         if x >= ldates:
             x = ldates - 1
 
-        if x < 0:
-            x = 0
-
+        x = max(x, 0)
         ix = self._dates[x]
 
         return super(AutoDateFormatter, self).__call__(ix, pos)

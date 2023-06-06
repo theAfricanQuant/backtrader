@@ -278,24 +278,33 @@ class OrderBase(with_metaclass(MetaParams, object)):
             super(Order, self).__setattribute__(name, value)
 
     def __str__(self):
-        tojoin = list()
-        tojoin.append('Ref: {}'.format(self.ref))
-        tojoin.append('OrdType: {}'.format(self.ordtype))
-        tojoin.append('OrdType: {}'.format(self.ordtypename()))
-        tojoin.append('Status: {}'.format(self.status))
-        tojoin.append('Status: {}'.format(self.getstatusname()))
-        tojoin.append('Size: {}'.format(self.size))
-        tojoin.append('Price: {}'.format(self.price))
-        tojoin.append('Price Limit: {}'.format(self.pricelimit))
-        tojoin.append('TrailAmount: {}'.format(self.trailamount))
-        tojoin.append('TrailPercent: {}'.format(self.trailpercent))
-        tojoin.append('ExecType: {}'.format(self.exectype))
-        tojoin.append('ExecType: {}'.format(self.getordername()))
-        tojoin.append('CommInfo: {}'.format(self.comminfo))
-        tojoin.append('End of Session: {}'.format(self.dteos))
-        tojoin.append('Info: {}'.format(self.info))
-        tojoin.append('Broker: {}'.format(self.broker))
-        tojoin.append('Alive: {}'.format(self.alive()))
+        tojoin = [
+            f'Ref: {self.ref}',
+            f'OrdType: {self.ordtype}',
+            f'OrdType: {self.ordtypename()}',
+        ]
+        tojoin.append(f'Status: {self.status}')
+        tojoin.extend(
+            (
+                f'Status: {self.getstatusname()}',
+                f'Size: {self.size}',
+                f'Price: {self.price}',
+                f'Price Limit: {self.pricelimit}',
+                f'TrailAmount: {self.trailamount}',
+                f'TrailPercent: {self.trailpercent}',
+                f'ExecType: {self.exectype}',
+            )
+        )
+        tojoin.extend(
+            (
+                f'ExecType: {self.getordername()}',
+                f'CommInfo: {self.comminfo}',
+                f'End of Session: {self.dteos}',
+                f'Info: {self.info}',
+                f'Broker: {self.broker}',
+            )
+        )
+        tojoin.append(f'Alive: {self.alive()}')
 
         return '\n'.join(tojoin)
 
@@ -320,11 +329,7 @@ class OrderBase(with_metaclass(MetaParams, object)):
         # Set a reference price if price is not set using
         # the close price
         pclose = self.data.close[0] if not self.simulated else self.price
-        if not self.price and not self.pricelimit:
-            price = pclose
-        else:
-            price = self.price
-
+        price = pclose if not self.price and not self.pricelimit else self.price
         dcreated = self.data.datetime[0] if not self.p.simulated else 0.0
         self.created = OrderData(dt=dcreated,
                                  size=self.size,
@@ -466,10 +471,7 @@ class OrderBase(with_metaclass(MetaParams, object)):
         '''Tries to retrieve the status from the broker in which the order is.
 
         Defaults to last known status if no broker is associated'''
-        if self.broker:
-            return self.broker.orderstatus(self)
-
-        return self.status
+        return self.broker.orderstatus(self) if self.broker else self.status
 
     def reject(self, broker=None):
         '''Marks an order as rejected'''
@@ -574,10 +576,7 @@ class Order(OrderBase):
                                    opened, openedvalue, openedcomm,
                                    margin, pnl, psize, pprice)
 
-        if self.executed.remsize:
-            self.status = Order.Partial
-        else:
-            self.status = Order.Completed
+        self.status = Order.Partial if self.executed.remsize else Order.Completed
 
         # self.comminfo = None
 

@@ -49,7 +49,7 @@ class TestStrategy(bt.Strategy):
 
     def __init__(self):
         # To control operation entries
-        self.orderid = list()
+        self.orderid = []
         self.order = None
 
         self.counttostop = 0
@@ -88,35 +88,43 @@ class TestStrategy(bt.Strategy):
         self.next(frompre=True)
 
     def next(self, frompre=False):
-        txt = list()
-        txt.append('Data0')
-        txt.append('%04d' % len(self.data0))
+        txt = ['Data0', '%04d' % len(self.data0)]
         dtfmt = '%Y-%m-%dT%H:%M:%S.%f'
-        txt.append('{:f}'.format(self.data.datetime[0]))
-        txt.append('%s' % self.data.datetime.datetime(0).strftime(dtfmt))
-        txt.append('{:f}'.format(self.data.open[0]))
-        txt.append('{:f}'.format(self.data.high[0]))
-        txt.append('{:f}'.format(self.data.low[0]))
-        txt.append('{:f}'.format(self.data.close[0]))
-        txt.append('{:6d}'.format(int(self.data.volume[0])))
-        txt.append('{:d}'.format(int(self.data.openinterest[0])))
-        txt.append('{:f}'.format(self.sma[0]))
+        txt.extend(
+            (
+                '{:f}'.format(self.data.datetime[0]),
+                '%s' % self.data.datetime.datetime(0).strftime(dtfmt),
+                '{:f}'.format(self.data.open[0]),
+                '{:f}'.format(self.data.high[0]),
+                '{:f}'.format(self.data.low[0]),
+                '{:f}'.format(self.data.close[0]),
+                '{:6d}'.format(int(self.data.volume[0])),
+                '{:d}'.format(int(self.data.openinterest[0])),
+                '{:f}'.format(self.sma[0]),
+            )
+        )
         print(', '.join(txt))
 
         if len(self.datas) > 1 and len(self.data1):
-            txt = list()
-            txt.append('Data1')
-            txt.append('%04d' % len(self.data1))
+            txt = ['Data1', '%04d' % len(self.data1)]
             dtfmt = '%Y-%m-%dT%H:%M:%S.%f'
-            txt.append('{}'.format(self.data1.datetime[0]))
-            txt.append('%s' % self.data1.datetime.datetime(0).strftime(dtfmt))
-            txt.append('{}'.format(self.data1.open[0]))
-            txt.append('{}'.format(self.data1.high[0]))
-            txt.append('{}'.format(self.data1.low[0]))
-            txt.append('{}'.format(self.data1.close[0]))
-            txt.append('{}'.format(self.data1.volume[0]))
-            txt.append('{}'.format(self.data1.openinterest[0]))
-            txt.append('{}'.format(float('NaN')))
+            txt.extend(
+                (
+                    '{}'.format(self.data1.datetime[0]),
+                    '%s' % self.data1.datetime.datetime(0).strftime(dtfmt),
+                    '{}'.format(self.data1.open[0]),
+                    '{}'.format(self.data1.high[0]),
+                    '{}'.format(self.data1.low[0]),
+                    '{}'.format(self.data1.close[0]),
+                )
+            )
+            txt.extend(
+                (
+                    '{}'.format(self.data1.volume[0]),
+                    '{}'.format(self.data1.openinterest[0]),
+                    '{}'.format(float('NaN')),
+                )
+            )
             print(', '.join(txt))
 
         if self.counttostop:  # stop after x live lines
